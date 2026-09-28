@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Smart Energy Decision Simulator</title>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <header class="app-header">
+            <div class="brand">
+                <div class="brand-icon">⚡</div>
+                <div>
+                    <h1>Smart Energy Simulator</h1>
+                    <p>
+                        Low-cost energy planning for renters and vulnerable
+                        households
+                    </p>
+                </div>
+            </div>
+
+            <nav class="top-nav">
+                <a href="#simulation"
+                    ><span class="nav-icon">🧩</span><span>Simulation</span></a
+                >
+                <a href="#peak-mode"
+                    ><span class="nav-icon">⏱️</span><span>Estimated Bills</span></a
+                >
+                <a href="#insights"
+                    ><span class="nav-icon">💡</span><span>Insights</span></a
+                >
+            </nav>
+
+            <div class="user-menu">
+                <button id="userBtn" class="user-btn" type="button">
+                    <span class="user-avatar" id="userAvatar">G</span>
+                    <span id="userLabel">Guest</span>
+                    <span class="caret">▾</span>
+                </button>
+                <div id="userDropdown" class="user-dropdown hidden">
+                    <button data-action="login" type="button">Log in</button>
+                    <button data-action="register" type="button">Register</button>
+                    <button data-action="history" type="button" class="hidden auth-only">History</button>
+                    <button data-action="export" type="button" class="hidden auth-only">Export backup</button>
+                    <button data-action="import" type="button" class="hidden auth-only">Import backup</button>
+                    <button data-action="logout" type="button" class="hidden auth-only">Log out</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="page-shell">
+            <aside class="sidebar">
+                <section class="side-card hero-card">
+                    <span class="eyebrow">Prototype flow</span>
+                    <h2>Simulation → Estimated Bills → Insights</h2>
+                    <p>
+                        This prototype turns invisible household electricity
+                        patterns into understandable, actionable decisions
+                        without requiring smart home hardware.
+                    </p>
+                </section>
+
+                <section class="side-card tariff-card">
+                    <div class="title-with-icon">
+                        <span class="title-icon">💸</span>
+                        <h3>Tariff guide</h3>
+                    </div>
+
+                    <div class="tariff-row">
+                        <div>
+                            <strong>Off-peak</strong>
+                            <p>10:00 PM – 7:00 AM</p>
+                        </div>
+                        <span>$0.18 / kWh</span>
+                    </div>
+
+                    <div class="tariff-row">
+                        <div>
+                            <strong>Shoulder</strong>
+                            <p>7:00 AM – 4:00 PM, 9:00 PM – 10:00 PM</p>
+                        </div>
+                        <span>$0.28 / kWh</span>
+                    </div>
+
+                    <div class="tariff-row">
+                        <div>
+                            <strong>Peak</strong>
+                            <p>4:00 PM – 9:00 PM</p>
+                        </div>
+                        <span>$0.45 / kWh</span>
+                    </div>
+                </section>
+
+                <section class="side-card scenario-card">
+                    <div class="title-with-icon">
+                        <span class="title-icon">🎯</span>
+                        <h3>Design goal</h3>
+                    </div>
+                    <ul>
+                        <li>Make appliance-level cost visible</li>
+                        <li>Show the trade-off between comfort and savings</li>
+                        <li>
+                            Support behaviour change, not expensive hardware
+                            upgrades
+                        </li>
+                    </ul>
+                </section>
+            </aside>
+
+            <section class="main-content">
+                <section class="flow-banner">
+                    <div class="flow-step active">
+                        <span>🧩</span><span>1. Simulation</span>
+                    </div>
+                    <div class="flow-line"></div>
+                    <div class="flow-step">
+                        <span>⏱️</span><span>2. Estimated Bills</span>
+                    </div>
+                    <div class="flow-line"></div>
+                    <div class="flow-step">
+                        <span>💡</span><span>3. Insights</span>
+                    </div>
+                </section>
+
+                <section id="simulation" class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <span class="eyebrow">Step 1</span>
+                            <h2>
+                                <span class="section-icon">🧩</span> Simulation
+                            </h2>
+                            <p>
+                                Set appliance usage, schedules, and frequency.
+                            </p>
+                        </div>
+                        <div class="period-toggle" role="group" aria-label="Billing period">
+                            <span class="period-toggle-label">Billing period</span>
+                            <div class="period-toggle-buttons">
+                                <button type="button" class="period-btn active" data-period="month">Month</button>
+                                <button type="button" class="period-btn" data-period="quarter">Quarter</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="applianceList" class="appliance-list"></div>
+
+                    <div class="simulation-footer">
+                        <div class="action-row">
+                            <button
+                                id="runAnalysisBtn"
+                                class="btn btn-primary"
+                                type="button"
+                            >
+                                <span>▶</span>
+                                <span>Run full analysis</span>
+                            </button>
+                            <button
+                                id="resetBtn"
+                                class="btn btn-secondary"
+                                type="button"
+                            >
+                                <span>↺</span>
+                                <span>Reset</span>
+                            </button>
+                        </div>
+
+                        <button
+                            id="addCustomBtn"
+                            class="btn btn-outline add-custom-bottom"
+                            type="button"
+                        >
+                            <span>＋</span>
+                            <span>Add custom appliance</span>
+                        </button>
+                    </div>
+                </section>
+
+                <section id="peak-mode" class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <span class="eyebrow">Step 2</span>
+                            <h2>
+                                <span class="section-icon">⏱️</span> Estimated Bills &amp; Peak Impact
+                            </h2>
+                            <p>
+                                How your bill splits across off-peak / shoulder /
+                                peak windows, and which appliances drive cost.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <article class="metric-card metric-card-primary">
+                            <span class="metric-label"
+                                ><span data-period-label>Monthly</span> estimated cost</span
+                            >
+                            <strong id="monthlyCost">$0.00</strong>
+                        </article>
+
+                        <article class="metric-card">
+                            <span class="metric-icon">⚡</span>
+                            <span class="metric-label"><span data-period-label>Monthly</span> energy</span>
+                            <strong id="energyUse">0.0 kWh</strong>
+                        </article>
+
+                        <article class="metric-card">
+                            <span class="metric-icon">🙂</span>
+                            <span class="metric-label">Comfort score</span>
+                            <strong id="comfortLevel">100%</strong>
+                        </article>
+
+                        <article class="metric-card">
+                            <span class="metric-icon">🔥</span>
+                            <span class="metric-label">Peak-hour use</span>
+                            <strong id="peakUsage">0%</strong>
+                        </article>
+
+                        <article class="metric-card">
+                            <span class="metric-icon">🌍</span>
+                            <span class="metric-label"
+                                >Environmental impact</span
+                            >
+                            <strong id="impactLevel">Low</strong>
+                        </article>
+                    </div>
+
+                    <div class="charts-grid">
+                        <article class="chart-card">
+                            <div class="card-head">
+                                <h3>
+                                    <span class="title-icon">📈</span> Tariff
+                                    cost distribution
+                                </h3>
+                                <p><span data-period-label>Monthly</span> cost by time period</p>
+                            </div>
+                            <div id="tariffChart" class="chart-rows"></div>
+                        </article>
+
+                        <article class="chart-card">
+                            <div class="card-head">
+                                <h3>
+                                    <span class="title-icon">📊</span> Appliance
+                                    cost breakdown
+                                </h3>
+                                <p><span data-period-label>Monthly</span> cost share by appliance</p>
+                            </div>
+                            <div id="applianceChart" class="appliance-pie-wrap">
+                                <svg id="appliancePie" class="appliance-pie" viewBox="0 0 200 200" aria-label="Appliance cost share pie chart"></svg>
+                                <div id="appliancePieLegend" class="appliance-pie-legend"></div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <article class="peak-risk-card">
+                        <div class="card-head">
+                            <h3>
+                                <span class="title-icon">🚨</span> Peak risk
+                                summary
+                            </h3>
+                            <p>Appliances most exposed to expensive periods</p>
+                        </div>
+                        <div id="peakRiskList" class="peak-risk-list"></div>
+                    </article>
+                </section>
+
+                <section id="insights" class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <span class="eyebrow">Step 3</span>
+                            <h2>
+                                <span class="section-icon">💡</span> Insights
+                            </h2>
+                            <p>
+                                AI-generated feedback comparing your plan with a
+                                cheaper suggested schedule.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="aiBanner" class="ai-banner hidden" role="status" aria-live="polite">
+                        <span class="ai-banner-icon">✨</span>
+                        <div class="ai-banner-body">
+                            <strong>AI insight ready</strong>
+                            <span>Personalised analysis generated from your latest run.</span>
+                        </div>
+                        <button type="button" class="ai-banner-close" aria-label="Dismiss">×</button>
+                    </div>
+
+                    <div class="feedback-grid">
+                        <article class="compare-card current">
+                            <span class="compare-label">Current plan</span>
+                            <strong id="currentCost">$0.00</strong>
+                            <p id="currentSummary">
+                                Your current schedule has not been analysed yet.
+                            </p>
+                        </article>
+
+                        <article class="compare-card improved">
+                            <span class="compare-label">Suggested plan</span>
+                            <strong id="improvedCost">$0.00</strong>
+                            <p id="improvedSummary">
+                                Run the analysis to generate a smarter schedule.
+                            </p>
+                        </article>
+                    </div>
+
+                    <article class="savings-card">
+                        <div class="savings-stat">
+                            <span>Estimated <span data-period-label>monthly</span> savings</span>
+                            <strong id="monthlySavings">$0.00</strong>
+                        </div>
+                        <div class="savings-stat">
+                            <span>Peak cost reduction</span>
+                            <strong id="peakReduction">0%</strong>
+                        </div>
+                        <div class="savings-stat">
+                            <span>Comfort change</span>
+                            <strong id="comfortChange">0 pts</strong>
+                        </div>
+                    </article>
+
+                    <article id="adviceCard" class="insight-card insight-good">
+                        <div class="insight-head">
+                            <div class="insight-status-wrap">
+                                <div
+                                    id="insightIcon"
+                                    class="insight-icon animated-icon"
+                                >
+                                    ✅
+                                </div>
+                                <div>
+                                    <h3 id="adviceTitle">
+                                        Efficient usage pattern
+                                    </h3>
+                                    <span id="adviceBadge" class="status-badge"
+                                        >Good</span
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <p id="adviceText">
+                            Your current schedule is relatively efficient and
+                            avoids unnecessary peak-hour pressure.
+                        </p>
+
+                        <ul id="adviceList" class="insight-list">
+                            <li>
+                                Keep flexible appliances outside expensive peak
+                                periods.
+                            </li>
+                            <li>
+                                Your current pattern supports cost control and
+                                lower energy waste.
+                            </li>
+                        </ul>
+                    </article>
+
+                    <article class="feedback-note">
+                        <h3>
+                            <span class="title-icon">📝</span> How the suggested
+                            plan works
+                        </h3>
+                        <ul id="feedbackList">
+                            <li>Run the analysis to generate a comparison.</li>
+                        </ul>
+                    </article>
+                </section>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p>© 2026 DECO7180 Energy Simulator. All rights reserved.</p>
+        </footer>
+
+        <!-- Login / Register modal -->
+        <div id="authModal" class="modal-overlay hidden">
+            <div class="modal-card">
+                <button class="modal-close" data-action="close-auth" type="button">×</button>
+                <div class="modal-tabs">
+                    <button class="modal-tab active" data-tab="login" type="button">Log in</button>
+                    <button class="modal-tab" data-tab="register" type="button">Register</button>
+                </div>
+                <form id="authForm" class="modal-form">
+                    <label>
+                        Username
+                        <input id="authUsername" type="text" autocomplete="username" required minlength="2" />
+                    </label>
+                    <label>
+                        Password
+                        <input id="authPassword" type="password" autocomplete="current-password" required minlength="4" />
+                    </label>
+                    <p id="authError" class="auth-error hidden"></p>
+                    <button id="authSubmit" type="submit" class="btn btn-primary">Log in</button>
+                    <button type="button" class="btn btn-outline" data-action="guest">Continue as guest</button>
+                </form>
+                <p class="modal-foot">© 2026 DECO7180 Energy Simulator</p>
+            </div>
+        </div>
+
+        <!-- History modal -->
+        <div id="historyModal" class="modal-overlay hidden">
+            <div class="modal-card modal-card-wide">
+                <button class="modal-close" data-action="close-history" type="button">×</button>
+                <h3>Your saved simulations</h3>
+                <div id="historyList" class="history-list">
+                    <p class="muted">No saved runs yet.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden file input for import -->
+        <input id="importFileInput" type="file" accept="application/json" class="hidden-input" />
+
+        <!-- AI chat widget -->
+        <button id="chatToggle" class="chat-toggle" type="button" aria-label="Open AI chat">💬</button>
+        <div id="chatPanel" class="chat-panel hidden">
+            <div class="chat-header">
+                <span>✨ Energy Coach</span>
+                <button id="chatClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div id="chatMessages" class="chat-messages">
+                <div class="chat-msg chat-msg-bot">Hi! Ask me anything about your simulation, tariffs, or how to save on your bill. You can also 📎 attach an electricity bill photo and I'll try to read it.</div>
+            </div>
+            <div id="chatAttachPreview" class="chat-attach-preview hidden">
+                <img id="chatAttachThumb" alt="attached bill preview" />
+                <span id="chatAttachName">image attached</span>
+                <button id="chatAttachRemove" type="button" aria-label="Remove attachment">×</button>
+            </div>
+            <form id="chatForm" class="chat-form">
+                <label class="chat-attach-btn" title="Attach bill image">
+                    📎
+                    <input id="chatFileInput" type="file" accept="image/*" hidden />
+                </label>
+                <input id="chatInput" type="text" placeholder="Ask the energy coach…" autocomplete="off" />
+                <button type="submit" aria-label="Send">➤</button>
+            </form>
+            <div class="chat-resize chat-resize-tl" data-resize="tl"></div>
+            <div class="chat-resize chat-resize-tr" data-resize="tr"></div>
+            <div class="chat-resize chat-resize-bl" data-resize="bl"></div>
+            <div class="chat-resize chat-resize-br" data-resize="br"></div>
+        </div>
+
+        <div id="toast" class="toast hidden">
+            <span id="toastText">Updated successfully</span>
+            <button id="toastOk" type="button">OK</button>
+        </div>
+
+        <script src="auth.js"></script>
+        <script src="ai.js"></script>
+        <script src="script.js"></script>
+    </body>
+</html>
